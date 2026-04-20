@@ -1,11 +1,11 @@
-# Deploy the Vite production build to GitHub Pages.
-# After pushing: Repo → Settings → Pages → Build: GitHub Actions.
+# Deploy the Vite production build to GitHub Pages (requires GitHub Actions on your account).
+# If Actions are blocked (e.g. billing), use branch deploy instead: `npm run deploy:gh-pages`
+# then Settings → Pages → Deploy from branch → gh-pages / (root).
+# Re-add `push: branches: [main]` below when Actions work again.
 # Site URL: https://<owner>.github.io/<repo>/
 name: Deploy to GitHub Pages
 
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
 
 permissions:
