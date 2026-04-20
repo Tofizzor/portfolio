@@ -1,0 +1,54 @@
+# Deploy the Vite production build to GitHub Pages (requires GitHub Actions on your account).
+# If Actions are blocked (e.g. billing), use branch deploy instead: `npm run deploy:gh-pages`
+# then Settings → Pages → Deploy from branch → gh-pages / (root).
+# Re-add `push: branches: [main]` below when Actions work again.
+# Site URL: https://<owner>.github.io/<repo>/
+name: Deploy to GitHub Pages
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        env:
+          # Project site: https://owner.github.io/repo-name/ — must match repo name (case-sensitive path).
+          VITE_BASE: /${{ github.event.repository.name }}/
+        run: npm run build
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
